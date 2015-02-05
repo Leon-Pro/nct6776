@@ -1,0 +1,40 @@
+#!/bin/sh
+
+load_module_nct6775()
+{
+  BOARD_VENDOR="$(cat /sys/class/dmi/id/board_vendor)"
+  BOARD_NAME="$(cat /sys/class/dmi/id/board_name)"
+  BIOS_VERSION="$(cat /sys/class/dmi/id/bios_version)"
+
+  if [ "$BOARD_VENDOR" = "ASRock" -a "$BOARD_NAME" = "Z77 Pro4-M" -a "$BIOS_VERSION" = "P2.00" ]; then
+
+    # ---
+    # Asrock Z77 Pro4-M fix to enable fans 3 to 5
+    #
+    # In "Ultra FastBoot" mode fans 3 to 5 are missing because the ASRock firmware does 
+    # not set up the Nuvoton NCT6776 chip correctly. Some register initialization is 
+    # needed before loading the nct6775 kernel module to enable all five fans.
+    # ---
+
+    # make sure the nct6775 hwmon module is not loaded
+    modprobe --remove --quiet nct6775
+
+    # enter NCT6776 "Extended Function Mode"
+    isaset -y 0x2e 0x2e 0x87 0x87
+    # select logical device HW-MONITOR
+    isaset -y 0x2e 0x2f 0x07 0x0b
+    # enable fans 3-5 by setting bits 5-7 in reg 0x30
+    isaset -y 0x2e 0x2f 0x30 0xe0 0xe0
+
+    # load module
+    modprobe --quiet nct6775
+
+  fi
+}
+
+if [[ $EUID -ne 0 ]]; then
+  echo "This script must be run as root" 1>&2
+  exit 1
+fi
+
+load_module_nct6775

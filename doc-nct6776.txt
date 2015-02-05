@@ -1,0 +1,72 @@
+#
+# Chip Global Control Register (CR)
+#
+
+0x07	Logical Device Selection register
+
+# fan pin setup specific registers
+
+0x1c 	Multi Function Selection
+	Bit 0: AUXFANIN1 on Pin4 (high)
+	Bit 1: AUXFANIN2 on Pin5 (high)
+
+0x24 	Global Option
+	Bit 6: AUXFANIN0 on Pin3 (low)
+	Bit 5: AUXFANOUT output type - low=Open-drain high=Push-pull
+	Bit 4: SYSFANOUT output type - low=Open-drain high=Push-pull
+	Bit 3: CPUFANOUT output type - low=Open-drain high=Push-pull
+
+0x2c	Multi Function Selection
+	Bit 7: AUXFANOUT on Pin98 (high)
+
+#
+# Logical Device B (Hardware Monitor, Front Panel LED)
+#
+
+0x30 	Select Fan Source
+	Bit 7: AUXFANIN0 Source Select: low=Pin3, high=Pin93 (GP70)
+	Bit 6: AUXFANIN1 Source Select: low=Pin4, high=Pin91 (GP72)
+	Bit 5: AUXFANIN2 Source Select: low=Pin5, high=Pin90 (GP73)
+
+#
+# Chip PINs
+#
+
+PIN	NAME		Comment
+--------------------------------------------------------------------
+3	AUXFANIN0	0 to +5 V amplitude fan tachometer input.
+4	AUXFANIN1	0 to +5 V amplitude fan tachometer input.
+5	AUXFANIN2	0 to +5 V amplitude fan tachometer input.
+93	AUXFANIN0	alternative to PIN3, see 0x30 Select Fan Source
+91	AUXFANIN1	alternative to PIN4, see 0x30 Select Fan Source
+90	AUXFANIN2	alternative to PIN5, see 0x30 Select Fan Source
+98	AUXFANOUT	PWM duty-cycle signal for fan speed control.
+			needs to be enabled via CR 0x2c Bit 7
+124	CPUFANIN	0 to +5 V amplitude fan tachometer input.
+125	CPUFANOUT	PWM duty-cycle signal for fan speed control.
+126	SYSFANIN	0 to +5 V amplitude fan tachometer input.
+127	SYSFANOUT	PWM duty-cycle signal for fan speed control.
+			DC voltage output for fan speed control.
+
+#
+# Register index
+#
+
+EFER - Extended Function Enable Registers : 0x2e or 0x4e
+EFIR - Extended Function Index Register   : EFER
+EFDR - Extended Function Data Register    : EFER + 1
+
+#
+# access global and logical device specific registers
+#
+
+1) Enter Extended Function Mode
+  --> write two times 0x87 to EFER
+
+2) Configure the Configuration Registers
+  --> write Logical Device Number (i.e. 0x07) to EFIR
+  --> write the number of the desired Logical Device (e.g. 0x0b = HW-MON) to the EFDR
+       If accessing the Chip (Global) Control Registers, this step is not required. 
+
+4) Exit Extended Function Mode
+  --> write two times 0xaa to EFER
