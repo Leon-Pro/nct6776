@@ -11,8 +11,8 @@ load_module_nct6775()
     # ---
     # Asrock Z77 Pro4-M fix to enable fans 3 to 5
     #
-    # In "Ultra FastBoot" mode fans 3 to 5 are missing because the ASRock firmware does 
-    # not set up the Nuvoton NCT6776 chip correctly. Some register initialization is 
+    # In "Ultra FastBoot" mode fans 3 to 5 are missing because the ASRock firmware does
+    # not set up the Nuvoton NCT6776 chip correctly. Some register initialization is
     # needed before loading the nct6775 kernel module to enable all five fans.
     # ---
 
